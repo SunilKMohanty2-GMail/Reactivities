@@ -15,7 +15,7 @@ export default function ActivityForm({actvity, closeForm, submitForm}: Props) {
         const formData = new FormData(event.currentTarget);
         const data: {[key: string]: FormDataEntryValue} = {}
 
-        formData.forEach((value, key) =>{
+        formData.forEach((value, key) => {
             data[key] = value;
         });
 
