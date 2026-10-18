@@ -29,7 +29,8 @@ export default function ActivityCard({ actvity, selectActivity }: Props) {
                         variant="contained" 
                         color="error"
                         onClick={() => deleteActivity.mutate(actvity.id)} 
-                        disabled={deleteActivity.isPending}
+                        loading={deleteActivity.isPending}
+                        // disabled={deleteActivity.isPending}
                     >Delete</Button>
                 </Box>
 
