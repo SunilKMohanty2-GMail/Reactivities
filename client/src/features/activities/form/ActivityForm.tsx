@@ -1,63 +1,75 @@
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
 import type { SubmitEvent } from 'react';
 import { useActivities } from "../../../lib/hooks/useActivities";
+import { useNavigate, useParams } from "react-router";
 
-type Props = {
-    actvity?: Activity
-    closeForm: () => void
-}
+export default function ActivityForm() {
+    const { id } = useParams();
+    const { updateActivity, createActivity, activity, isLoadingActivity } = useActivities(id);
+    const navigate = useNavigate();
 
-export default function ActivityForm({actvity, closeForm}: Props) {
-    const {updateActivity, createActivity} = useActivities();
+    const handleCancel = () => {
+        if (id)
+            navigate(`/activities/${id}`);
+        else
+            navigate(`/activities/`);
+    };
 
     const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
         //console.log(event);
         const formData = new FormData(event.currentTarget);
-        const data: {[key: string]: FormDataEntryValue} = {}
+        const data: { [key: string]: FormDataEntryValue } = {}
 
         formData.forEach((value, key) => {
             data[key] = value;
         });
 
-        if(actvity) {
-            data.id = actvity.id;
+        if (activity) {
+            data.id = activity.id;
             await updateActivity.mutateAsync(data as unknown as Activity);
-            closeForm();
-        } else {
-            await createActivity.mutateAsync(data as unknown as Activity);
-            closeForm();
+            navigate(`/activities/${activity.id}`)
+        }
+        else {
+            await createActivity.mutateAsync(data as unknown as Activity, {
+                onSuccess: (id) => {
+                    console.log(id);
+                    navigate(`/activities/${id}`);
+                }
+            });
         }
         console.log(data);
     }
 
-  return (
-    <Paper sx={{borderRadius: 3, padding: 3}}>
-        <Typography variant="h5" gutterBottom color="primary">
-            Create Activity
-        </Typography>
-        <Box component='form' onSubmit={handleSubmit} sx={{display:'flex', flexDirection: 'column', gap: 3}}>
-            <TextField name='title' label='Title' defaultValue={actvity?.title} />
-            <TextField name='description' label='Description' multiline rows={3} defaultValue={actvity?.description} />
-            <TextField name='category' label='Category' defaultValue={actvity?.category} />
-            <TextField name='date' label='Date' type="date" 
-                defaultValue={actvity?.date
-                    ? new Date(actvity.date).toISOString().split('T')[0]
-                    : new Date().toISOString().split('T')[0]} 
-            />
-            <TextField name='city' label='City' defaultValue={actvity?.city} />
-            <TextField name='venue' label='Venue' defaultValue={actvity?.venue} />
-            <Box sx={{display: 'flex', justifyContent: 'end', gap: 4}}>
-                <Button onClick={closeForm} color='inherit'>Cancel</Button>
-                <Button 
-                    type="submit" 
-                    color='success' 
-                    variant="contained"                    
-                    loading={updateActivity.isPending || createActivity.isPending}
+    if (isLoadingActivity) return <Typography>Loading activity ...</Typography>
+
+    return (
+        <Paper sx={{ borderRadius: 3, padding: 3 }}>
+            <Typography variant="h5" gutterBottom color="primary">
+                {activity ? 'Edit Activity' : 'Create Activity'}                
+            </Typography>
+            <Box component='form' onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <TextField name='title' label='Title' defaultValue={activity?.title} />
+                <TextField name='description' label='Description' multiline rows={3} defaultValue={activity?.description} />
+                <TextField name='category' label='Category' defaultValue={activity?.category} />
+                <TextField name='date' label='Date' type="date"
+                    defaultValue={activity?.date
+                        ? new Date(activity.date).toISOString().split('T')[0]
+                        : new Date().toISOString().split('T')[0]}
+                />
+                <TextField name='city' label='City' defaultValue={activity?.city} />
+                <TextField name='venue' label='Venue' defaultValue={activity?.venue} />
+                <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4 }}>
+                    <Button color='inherit' onClick={handleCancel}>Cancel</Button>
+                    <Button
+                        type="submit"
+                        color='success'
+                        variant="contained"
+                        loading={updateActivity.isPending || createActivity.isPending}
                     // disabled={updateActivity.isPending || createActivity.isPending}
-                >Submit</Button>
+                    >Submit</Button>
+                </Box>
             </Box>
-        </Box>
-    </Paper>
-  )
+        </Paper>
+    )
 }
