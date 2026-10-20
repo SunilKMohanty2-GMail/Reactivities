@@ -29,7 +29,7 @@ export default function NavBar() {
                 <MenuItemLink to='/activities'>
                   Activities
                 </MenuItemLink>
-                <MenuItemLink to='/activity/create'>
+                <MenuItemLink to='/createActivity'>
                   Create Activity
                 </MenuItemLink>                
               </MenuList>
