@@ -12,6 +12,17 @@ import { router } from './app/router/Routes.tsx';
 
 const queryClient = new QueryClient
 
+// TypeScript only:
+declare global {
+  interface Window {
+    __TANSTACK_QUERY_CLIENT__:
+      import('@tanstack/query-core')
+        .QueryClient
+  }
+}
+
+window.__TANSTACK_QUERY_CLIENT__ = queryClient;
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
