@@ -36,7 +36,7 @@ export default function ActivityDetailInfo({ activity }: Props) {
                 </Grid>
                 <Grid size={11}>
                     <Typography>
-                        {activity.venue}, {activity.city}}
+                        {activity.venue}, {activity.city}
                     </Typography>
                 </Grid>
             </Grid>
