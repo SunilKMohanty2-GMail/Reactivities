@@ -39,7 +39,7 @@ export default function ActivityForm() {
         if (id)
             navigate(`/activities/${id}`);
         else
-            navigate(`/activities/`);
+            navigate(`/activities`);
     };
 
     const onSubmit = async (data: ActivitySchema) => {
@@ -76,7 +76,7 @@ export default function ActivityForm() {
                     <SelectInput label='Category' control={control} name='category' items={categoryOptions} />
                     <DateTimeInput label='Date' control={control} name='date' />
                 </Box>                
-                <LocationInput control={control} label='Enter the location' name="location"/>
+                <LocationInput control={control} label='Enter the location' name='location'/>
                 <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4 }}>
                     <Button color='inherit' onClick={handleCancel}>Cancel</Button>
                     <Button
