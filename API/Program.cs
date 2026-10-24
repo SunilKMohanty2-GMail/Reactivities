@@ -30,12 +30,11 @@ builder.Services.AddMediatR(config =>
     config.LicenseKey = builder.Configuration["Licences:MediatR"];
 }); 
 
-//builder.Services.AddAutoMapper(config => config.AddMaps(typeof(MappingProfiles).Assembly));
-//builder.Services.AddAutoMapper(config => config.AddMaps(typeof(MappingProfiles)));
 builder.Services.AddAutoMapper(config =>
 {
-    config.LicenseKey = builder.Configuration["Licences:MediatR"];
-}, typeof(MappingProfiles));
+    config.AddMaps(typeof(MappingProfiles));
+    config.LicenseKey = builder.Configuration["Licences:MediatR"];    
+});
 builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddIdentityApiEndpoints<User>(options =>
