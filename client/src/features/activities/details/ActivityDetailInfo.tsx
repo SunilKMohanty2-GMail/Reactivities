@@ -1,13 +1,16 @@
 import { CalendarToday, Info, Place } from "@mui/icons-material";
-import { Divider, Grid, Paper, Typography } from "@mui/material";
-import { format } from "date-fns";
+import { Box, Button, Divider, Grid, Paper, Typography } from "@mui/material";
 import { formatDate } from "../../../lib/util/util";
+import { useState } from "react";
+import MapComponent from "../../../app/shared/components/MapComponent";
 
 type Props = {
     activity: Activity
 }
 
 export default function ActivityDetailInfo({ activity }: Props) {
+    const [mapOpen, setMapOpen] = useState(false);
+    
     return (
         <Paper sx={{ mb: 2 }}>
 
@@ -34,12 +37,26 @@ export default function ActivityDetailInfo({ activity }: Props) {
                 <Grid size={1}>
                     <Place color="info" fontSize="large" />
                 </Grid>
-                <Grid size={11}>
+                <Grid size={11} sx={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                     <Typography>
                         {activity.venue}, {activity.city}
                     </Typography>
+                    <Button 
+                        sx={{whiteSpace: 'nowrap', mx: 2}}
+                        onClick={() => setMapOpen(!mapOpen)}>
+                        {mapOpen ? 'Hide Map' : 'Show Map'}
+                    </Button>
                 </Grid>
             </Grid>
+            {mapOpen && (
+                <Box sx={{height: 400, zIndex: 1000, display: 'block'}}>
+                    <MapComponent
+                        position={[activity.latitude, activity.longitude]}
+                        venue={activity.venue}
+                    />
+                </Box>
+
+            )}
         </Paper>
     )
 }
