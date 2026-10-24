@@ -27,10 +27,15 @@ builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssemblyContaining<GetActivityList.Handler>();
     config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+    config.LicenseKey = builder.Configuration["Licences:MediatR"];
 }); 
 
 //builder.Services.AddAutoMapper(config => config.AddMaps(typeof(MappingProfiles).Assembly));
-builder.Services.AddAutoMapper(config => config.AddMaps(typeof(MappingProfiles)));
+//builder.Services.AddAutoMapper(config => config.AddMaps(typeof(MappingProfiles)));
+builder.Services.AddAutoMapper(config =>
+{
+    config.LicenseKey = builder.Configuration["Licences:MediatR"];
+}, typeof(MappingProfiles));
 builder.Services.AddValidatorsFromAssemblyContaining<CreateActivityValidator>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddIdentityApiEndpoints<User>(options =>
