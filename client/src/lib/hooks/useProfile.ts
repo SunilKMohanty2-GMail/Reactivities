@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import agent from "../api/agent";
 import { useMemo } from "react";
+import type { EditProfileSchema } from "../schemas/editProfileSchema";
 
 export const useProfile = (id?: string) => {
     const queryClient = useQueryClient();
-    
+
     const { data: profile, isLoading: loadingProfile } = useQuery<Profile>({
         queryKey: ['profile', id],
         queryFn: async () => {
@@ -14,13 +15,13 @@ export const useProfile = (id?: string) => {
         enabled: !!id
     });
 
-    const {data: photos, isLoading: loadingPhotos} = useQuery<Photo[]>({
+    const { data: photos, isLoading: loadingPhotos } = useQuery<Photo[]>({
         queryKey: ['photos', id],
         queryFn: async () => {
             const response = await agent.get<Photo[]>(`/profiles/${id}/photos`);
             return response.data
         },
-        enabled: !!id 
+        enabled: !!id
     });
 
     const uploadPhoto = useMutation({
@@ -28,7 +29,7 @@ export const useProfile = (id?: string) => {
             const formData = new FormData();
             formData.append('file', file);
             const response = await agent.post('/profiles/add-photo', formData, {
-                headers: {'Content-type': 'multipart/form-data'}
+                headers: { 'Content-type': 'multipart/form-data' }
             });
             return response.data;
         },
@@ -86,10 +87,33 @@ export const useProfile = (id?: string) => {
         }
     });
 
+    const updateProfile = useMutation({
+        mutationFn: async (profile: EditProfileSchema) => {
+            await agent.put(`/profiles`, profile);
+        },
+        onSuccess: (_, profile) => {
+            queryClient.setQueryData(['profile', id], (data: Profile) => {
+                if (!data) return data;
+                return {
+                    ...data,
+                    displayName: profile.displayName,
+                    bio: profile.bio
+                }
+            });
+            queryClient.setQueryData(['user'], (userData: User) => {
+                if (!userData) return userData;
+                return {
+                    ...userData,
+                    displayName: profile.displayName
+                }
+            });
+        }
+    });
+
     const isCurrentUser = useMemo(() => {
-      return id === queryClient.getQueryData<User>(['user'])?.id
+        return id === queryClient.getQueryData<User>(['user'])?.id
     }, [id, queryClient])
-    
+
     return {
         profile,
         loadingProfile,
@@ -98,6 +122,7 @@ export const useProfile = (id?: string) => {
         isCurrentUser,
         uploadPhoto,
         setMainPhoto,
-        deletePhoto
+        deletePhoto,
+        updateProfile
     }
 }

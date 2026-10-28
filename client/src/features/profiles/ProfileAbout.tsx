@@ -13,16 +13,25 @@ export default function ProfileAbout() {
         <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h5">About {profile?.displayName}</Typography>
-                {isCurrentUser &&
-                    <Button onClick={() => setEditMode(!editMode)}>
+                {isCurrentUser && !editMode &&
+                    <Button onClick={() => setEditMode(true)}>
                         Edit profile
-                    </Button>}
+                    </Button>
+                }
+                {editMode && (
+                    <Button onClick={() => setEditMode(false)}>
+                        Cancel
+                    </Button>
+                )}
             </Box>
             <Divider sx={{ my: 2 }} />
             <Box sx={{ overflow: 'auto', maxHeight: 350 }}>
-                <Typography variant='body1' sx={{ whiteSpace: 'pre-wrap' }}>
-                    {profile?.bio || 'No description added yet'}
-                </Typography>
+                {!editMode && (
+                    <Typography variant='body1' sx={{ whiteSpace: 'pre-wrap' }}>
+                        {profile?.bio || 'No description added yet'}
+                    </Typography>
+                )}
+
                 {editMode && (
                     <ProfileEdit setEditMode={setEditMode} />
                 )}
