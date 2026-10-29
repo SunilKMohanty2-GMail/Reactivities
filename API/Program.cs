@@ -13,6 +13,7 @@ using Application.Interfaces;
 using Infrastructure.Security;
 using System.Text.Json.Serialization;
 using Infrastructure.Photos;
+using API.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 builder.Services.AddCors();
+builder.Services.AddSignalR();
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssemblyContaining<GetActivityList.Handler>();
@@ -75,9 +77,10 @@ app.UseCors(options => options
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapGroup("api").MapIdentityApi<User>();
 
 app.MapControllers();
+app.MapGroup("api").MapIdentityApi<User>();
+app.MapHub<CommentHub>("/comments");
 
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
