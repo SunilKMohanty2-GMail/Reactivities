@@ -35,6 +35,8 @@ agent.interceptors.response.use(
         switch (status) {
             case 400:
                 if (data.errors) {
+                    toast.error('Validation error');
+                    
                     const modalStateErrors = [];
                     for (const key in data.errors) {
                         if (data.errors[key]) {
@@ -46,6 +48,7 @@ agent.interceptors.response.use(
                     toast.error(data);
                 }
                 break;
+
             case 401:
                 // toast.error('Unauthorised');
                 if (data.detail === 'NotAllowed') {
@@ -54,18 +57,21 @@ agent.interceptors.response.use(
                     toast.error('Unauthorised');
                 }
                 break;
-                break;
+                
             case 403:
                 toast.error('forbidden');
                 break;
+
             case 404:
                 //toast.error('not-found');
                 await router.navigate('/not-found');
                 break;
+
             case 500:
                 //toast.error('server-error');
                 router.navigate('/server-error', {state: {error: data}})
                 break;
+
             default:
                 break;
 

@@ -1,5 +1,5 @@
-import { Box, Button, Paper, TextField, Typography } from "@mui/material";
-import { useEffect } from 'react';
+import { Alert, Box, Button, Paper, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from 'react';
 import { useActivities } from "../../../lib/hooks/useActivities";
 import { useNavigate, useParams } from "react-router";
 import { useForm } from 'react-hook-form';
@@ -10,9 +10,11 @@ import SelectInput from "../../../app/shared/components/SelectInput";
 import { categoryOptions } from "./categoryOptions";
 import DateTimeInput from "../../../app/shared/components/DateTimeInput";
 import LocationInput from "../../../app/shared/components/LocationInput";
+import { toast } from "react-toastify";
 
 export default function ActivityForm() {
-    const {control, reset, handleSubmit } = useForm<ActivitySchema>({
+    const [validationErrors, setValidationErrors] = useState<string[]>([]);
+    const { control, reset, handleSubmit } = useForm<ActivitySchema>({
         mode: 'onTouched',
         resolver: zodResolver(activitySchema)
     });
@@ -48,12 +50,28 @@ export default function ActivityForm() {
         try {
             if (activity) {
                 updateActivity.mutate({ ...activity, ...flattenedData } as Activity, {
-                    onSuccess: () => navigate(`/activities/${activity.id}`)
+                    onSuccess: () => {
+                        navigate(`/activities/${activity.id}`)
+                    },
+                    onError: (err) => {                        
+                        if (Array.isArray(err)) {
+                            setValidationErrors(err);
+                        } else {
+                            setValidationErrors([]);
+                        }
+                    }
                 });
             } else {
                 createActivity.mutate(flattenedData as Activity, {
                     onSuccess: (id) => {
                         navigate(`/activities/${id}`);
+                    },
+                    onError: (err) => {
+                        if (Array.isArray(err)) {
+                            setValidationErrors(err);
+                        } else {
+                            setValidationErrors([]);
+                        }
                     }
                 });
             }
@@ -69,14 +87,14 @@ export default function ActivityForm() {
             <Typography variant="h5" gutterBottom color="primary">
                 {activity ? 'Edit Activity' : 'Create Activity'}
             </Typography>
-            <Box component='form' onSubmit={handleSubmit(onSubmit)} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Box component='form' onSubmit={handleSubmit(onSubmit)} sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 3 }}>
                 <TextInput label='Title' control={control} name='title' />
-                <TextInput label='Description' control={control} name='description' multiline rows={3} />                
-                <Box sx={{display:'flex', gap:3}}>
+                <TextInput label='Description' control={control} name='description' multiline rows={3} />
+                <Box sx={{ display: 'flex', gap: 3 }}>
                     <SelectInput label='Category' control={control} name='category' items={categoryOptions} />
                     <DateTimeInput label='Date' control={control} name='date' />
-                </Box>                
-                <LocationInput control={control} label='Enter the location' name='location'/>
+                </Box>
+                <LocationInput control={control} label='Enter the location' name='location' />
                 <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4 }}>
                     <Button color='inherit' onClick={handleCancel}>Cancel</Button>
                     <Button
@@ -87,6 +105,13 @@ export default function ActivityForm() {
                     // disabled={updateActivity.isPending || createActivity.isPending}
                     >Submit</Button>
                 </Box>
+            </Box>
+            <Box sx={{mt: 3}}>
+                {validationErrors.map((err, i) => (
+                    <Alert severity='error' key={i}>
+                        {err}
+                    </Alert>
+                ))}
             </Box>
         </Paper>
     )
