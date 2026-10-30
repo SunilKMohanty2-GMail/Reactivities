@@ -8,7 +8,6 @@ type Props = {
 }
 
 export default function AvatarPopover({ profile }: Props) {
-    const following = false;
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
     const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -29,7 +28,7 @@ export default function AvatarPopover({ profile }: Props) {
                 to={`/profiles/${profile.id}`}
                 alt={profile.displayName + ' image'}
                 sx={{
-                    border: following ? 3 : 0,
+                    border: profile.following ? 3 : 0,
                     borderColor: 'secondary.main'
                 }}
                 onMouseEnter={handlePopoverOpen}
