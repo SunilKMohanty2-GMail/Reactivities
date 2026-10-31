@@ -4,6 +4,7 @@ using Application.Core;
 using AutoMapper;
 using Domain;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Activities.Commands;
@@ -25,6 +26,8 @@ public class EditActivity
                 if(activity == null) return Result<Unit>.Failure("Activity not found", 404);
 
             mapper.Map(request.ActivityDto, activity);
+
+            context.Entry(activity).State = EntityState.Modified;
 
             var result = await context.SaveChangesAsync(cancellationToken) > 0;
 
