@@ -27,4 +27,3 @@ export default function MapComponent({ position, venue }: Props) {
             </Marker>
         </MapContainer>
     )
-}

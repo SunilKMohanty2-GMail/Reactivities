@@ -1,4 +1,4 @@
-import { Button, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import ActivityList from "./ActivityList";
 import ActivityFilters from "./ActivityFilters";
 // import { useActivities } from "../../../lib/hooks/useActivities";

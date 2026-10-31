@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Paper, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
 import { useActivities } from "../../../lib/hooks/useActivities";
 import { useNavigate, useParams } from "react-router";
@@ -10,7 +10,6 @@ import SelectInput from "../../../app/shared/components/SelectInput";
 import { categoryOptions } from "./categoryOptions";
 import DateTimeInput from "../../../app/shared/components/DateTimeInput";
 import LocationInput from "../../../app/shared/components/LocationInput";
-import { toast } from "react-toastify";
 
 export default function ActivityForm() {
     const [validationErrors, setValidationErrors] = useState<string[]>([]);
