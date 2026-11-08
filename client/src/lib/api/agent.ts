@@ -22,12 +22,12 @@ agent.interceptors.request.use(config => {
 
 agent.interceptors.response.use(
     async response => {
-        if(import.meta.env.DEV) await sleep(500);
+        if(import.meta.env.DEV) await sleep(100);
         store.uiStore.isIdle();
         return response;
     },
     async error => {
-        if(import.meta.env.DEV) await sleep(500);
+        if(import.meta.env.DEV) await sleep(100);
         store.uiStore.isIdle();
         //console.log('axios error: ' + error)
 
