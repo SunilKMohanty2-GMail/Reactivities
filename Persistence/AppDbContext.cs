@@ -20,13 +20,13 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(op
 
         builder.Entity<ActivityAttendee>(x =>
         {
-           x.HasKey(a => new { a.ActivityId, a.UserId });
+            x.HasKey(a => new { a.ActivityId, a.UserId });
 
-           x.HasOne(x => x.User)
-                .WithMany(x => x.Activities)
-                .HasForeignKey(x => x.UserId)
-                .OnDelete(DeleteBehavior.Cascade);                
-            
+            x.HasOne(x => x.User)
+                 .WithMany(x => x.Activities)
+                 .HasForeignKey(x => x.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
             x.HasOne(x => x.Activity)
                 .WithMany(x => x.Attendees)
                 .HasForeignKey(x => x.ActivityId)
@@ -47,20 +47,44 @@ public class AppDbContext(DbContextOptions options) : IdentityDbContext<User>(op
                 .OnDelete(DeleteBehavior.NoAction);
         });
 
-        var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
-            v => v.ToUniversalTime(), // Convert to UTC before saving
-            v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Read as UTC
-        );
+        // // [Option 1] - Correctly save and read datetimes in UTC using Entity Framework Core
+        // var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+        //     // On Save: If it's already UTC, save it; otherwise, convert it to UTC
+        //     v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
 
-        foreach (var entityType in builder.Model.GetEntityTypes())
-        {
-            foreach (var property in entityType.GetProperties())
-            {
-                if (property.ClrType == typeof(DateTime))
-                {
-                    property.SetValueConverter(dateTimeConverter);
-                }
-            }
-        }     
+        //     // On Read: Explicitly label the unspecified DB value as UTC
+        //     v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+        // );
+
+        // foreach (var entityType in builder.Model.GetEntityTypes())
+        // {
+        //     foreach (var property in entityType.GetProperties())
+        //     {
+        //         // Applies to all non-nullable DateTime fields
+        //         if (property.ClrType == typeof(DateTime))
+        //             property.SetValueConverter(dateTimeConverter);
+
+        //         // Applies to all nullable DateTime fields
+        //         if (property.ClrType == typeof(DateTime?))
+        //             property.SetValueConverter(dateTimeConverter);
+        //     }
+        // }
+
+        // [Option 2] - Correctly save and read datetimes in UTC using Entity Framework Core
+        // Create a Custom UTC Value Converter (UtcDateTimeConverter class)
+        // Override the ConfigureConventions method and assign the conversion to DateTime & DateTime? fields
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        // Automatically applies to all non-nullable DateTime fields
+        configurationBuilder
+            .Properties<DateTime>()
+            .HaveConversion<UtcDateTimeConverter>();
+
+        // Automatically applies to all nullable DateTime? fields
+        configurationBuilder
+            .Properties<DateTime?>()
+            .HaveConversion<UtcDateTimeConverter>();
     }
 }
