@@ -34,7 +34,7 @@ export default function ResetPasswordForm() {
     return (
         <AccountFormWrapper<ResetPasswordSchema>
             title="Reset your password"
-            submitButtonText="Request password"
+            submitButtonText="Update password"
             onSubmit={onSubmit}
             resolver={zodResolver(resetPasswordSchema)}
             icon={<LockOpen fontSize="large" />}

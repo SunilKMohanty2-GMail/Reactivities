@@ -88,6 +88,18 @@ export const useAccount = () => {
             await agent.post('/resetPassword', data);
         }
     });
+
+    const fetchGithubToken = useMutation({
+        mutationFn: async (code: string) => {
+            const response = await agent.post(`/account/github-login?code=${code}`);
+            return response.data;
+        },
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ['user']
+            })
+        }
+    })
     
     return {        
         currentUser,
@@ -99,6 +111,7 @@ export const useAccount = () => {
         resendConfirmationEmail,
         changePassword,
         forgotPassword,
-        resetPassword
+        resetPassword,
+        fetchGithubToken
     }
 }
